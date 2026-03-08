@@ -42,7 +42,7 @@ class BalancePlugin(Star):
         yield event.plain_result("\n".join(results))
 
     @filter.llm_tool(name="query_balance")
-    async def query_balance(self) -> str:
+    async def query_balance(self, event: AstrMessageEvent) -> str:
         """
         查询并返回当前配置的所有余额信息。
 
