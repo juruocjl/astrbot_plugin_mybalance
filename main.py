@@ -3,7 +3,7 @@ import asyncio
 import yaml
 import re
 
-from astrbot.api.event import filter, AstrMessageEvent, MessageEventResult
+from astrbot.api.event import filter, AstrMessageEvent
 from astrbot.api.star import Context, Star, register
 from astrbot.api import logger
 from astrbot.api import AstrBotConfig
@@ -42,16 +42,18 @@ class BalancePlugin(Star):
         yield event.plain_result("\n".join(results))
 
     @filter.llm_tool(name="query_balance")
-    async def query_balance(self, event: AstrMessageEvent) -> MessageEventResult:
+    async def query_balance(self) -> str:
         """
-        查询并返回当前配置的所有余额信息
+        查询并返回当前配置的所有余额信息。
+
+        Returns:
+            string: 拼接后的余额结果文本（返回给 LLM，不直接发送到会话）
         """
         if not self.enable_llm_tool:
-            yield event.plain_result("余额查询 LLM 工具未启用")
-            return
+            return "余额查询 LLM 工具未启用"
 
         results = await self._query_all()
-        yield event.plain_result("\n".join(results))
+        return "\n".join(results)
 
     async def _query_all(self) -> list[str]:
         if self.use_yaml_config:
